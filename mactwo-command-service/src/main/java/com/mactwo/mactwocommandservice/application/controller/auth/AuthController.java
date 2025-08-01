@@ -12,6 +12,8 @@ import com.mactwo.mactwocommandservice.application.controller.base.RestApiV1;
 import com.mactwo.mactwocommandservice.application.controller.base.RestData;
 import com.mactwo.mactwocommandservice.application.controller.base.VsResponseUtil;
 import com.mactwo.mactwocommandservice.infrastructure.mapper.UserMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +35,8 @@ public class AuthController {
     private final RegisterUserCommandHandler registerUserCommandHandler;
     private final UserMapper userMapper;
 
+    @Tag(name = "api-auth")
+    @Operation(summary = "Đăng nhập")
     @PostMapping("/login")
     public ResponseEntity<RestData<?>> login(@RequestBody LoginRequest request) {
         var command = new LoginCommand(request);
@@ -40,6 +44,8 @@ public class AuthController {
         return VsResponseUtil.ok(response);
     }
 
+    @Tag(name = "api-auth")
+    @Operation(summary = "Đăng xuất")
     @PostMapping("/logout")
     public ResponseEntity<RestData<?>> logout(HttpServletRequest request) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -53,6 +59,8 @@ public class AuthController {
         return VsResponseUtil.ok("Logout successful.");
     }
 
+    @Tag(name = "api-auth")
+    @Operation(summary = "Đăng ký tài khoản")
     @PostMapping("/register")
     public ResponseEntity<RestData<?>> registerUser(@RequestBody UserRegisterRequest request) {
 

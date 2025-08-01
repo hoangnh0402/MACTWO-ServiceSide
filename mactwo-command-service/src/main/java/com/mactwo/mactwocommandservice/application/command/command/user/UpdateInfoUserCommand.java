@@ -6,14 +6,14 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class UpdateProfileCommand {
+public class UpdateInfoUserCommand {
     private final Long userId;
     private final String fullName;
     private final String phoneNumber;
     private final LocalDate dateOfBirth;
     private final String gender;
 
-    public UpdateProfileCommand(Long userId, UpdateProfileRequest request) {
+    public UpdateInfoUserCommand(Long userId, UpdateProfileRequest request) {
         this.userId = userId;
         this.fullName = request.getFullName();
         this.phoneNumber = request.getPhoneNumber();

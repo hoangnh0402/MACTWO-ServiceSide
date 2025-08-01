@@ -14,45 +14,45 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Service
 public class RegisterUserCommandHandler {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public RegisterUserCommandHandler(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, KafkaTemplate<String, Object> kafkaTemplate, RoleRepository roleRepository) {
+    public RegisterUserCommandHandler(UserRepository userRepository,
+                                      RoleRepository roleRepository,
+                                      UserMapper userMapper,
+                                      PasswordEncoder passwordEncoder,
+                                      KafkaTemplate<String, Object> kafkaTemplate) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.kafkaTemplate = kafkaTemplate;
-        this.roleRepository = roleRepository;
     }
 
     @Transactional
     public User handle(RegisterUserCommand command) {
+
         if (userRepository.findByEmail(command.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new IllegalStateException("Email already in use: " + command.getEmail());
         }
 
-        User user = new User();
-        user.setFullName(command.getFullName());
-        user.setEmail(command.getEmail());
-        user.setPhoneNumber(command.getPhoneNumber());
-        user.setDateOfBirth(command.getDateOfBirth());
-        user.setGender(command.getGender());
+        User user = userMapper.toUser(command);
+
         user.setPasswordHash(passwordEncoder.encode(command.getPassword()));
-
         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
-
-        user.getRoles().add(userRole);
-
+                .orElseThrow(() -> new RuntimeException("Error: Default role ROLE_USER not found in database."));
+        user.setRoles(Set.of(userRole));
         User savedUser = userRepository.save(user);
-
         UserRegisteredEvent event = userMapper.toUserRegisteredEvent(savedUser);
+
         kafkaTemplate.send(TopicConstant.UserTopic.USER_REGISTERED, event);
 
         return savedUser;
