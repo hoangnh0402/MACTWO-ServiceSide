@@ -4,6 +4,9 @@ import com.mactwo.mactwocommandservice.domain.model.base.AuditEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "products")
 @Data
@@ -18,9 +21,15 @@ public class Product extends AuditEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    private String name;
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    private List<ProductVariant> variants = new ArrayList<>();
 
-    private String ram;
+    private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;

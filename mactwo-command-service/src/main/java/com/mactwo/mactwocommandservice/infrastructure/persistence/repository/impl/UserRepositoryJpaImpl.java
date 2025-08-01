@@ -3,17 +3,15 @@ package com.mactwo.mactwocommandservice.infrastructure.persistence.repository.im
 import com.mactwo.mactwocommandservice.domain.model.User;
 import com.mactwo.mactwocommandservice.domain.repository.UserRepository;
 import com.mactwo.mactwocommandservice.infrastructure.persistence.repository.JpaUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class UserRepositoryJpaImpl implements UserRepository {
-
     private final JpaUserRepository jpaRepository;
 
-    @Autowired
     public UserRepositoryJpaImpl(JpaUserRepository jpaRepository) {
         this.jpaRepository = jpaRepository;
     }
@@ -31,5 +29,10 @@ public class UserRepositoryJpaImpl implements UserRepository {
     @Override
     public Optional<User> findByEmail(String email) {
         return jpaRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return jpaRepository.findAll();
     }
 }

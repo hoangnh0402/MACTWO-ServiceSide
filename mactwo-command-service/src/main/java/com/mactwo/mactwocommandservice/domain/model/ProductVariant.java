@@ -21,7 +21,8 @@ public class ProductVariant {
 
     private String color;
     private String storage;
-    // Có thể thêm các thuộc tính khác như RAM, etc.
+
+    private String ram;
 
     private BigDecimal price;
 

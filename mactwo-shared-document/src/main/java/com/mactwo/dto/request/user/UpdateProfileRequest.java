@@ -1,15 +1,12 @@
-package com.mactwo.dto.response;
+package com.mactwo.dto.request.user;
 
 import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class UserResponse {
-    private Long id;
+public class UpdateProfileRequest {
     private String fullName;
-    private String email;
     private String phoneNumber;
     private LocalDate dateOfBirth;
     private String gender;
-    private boolean isActive;
 }

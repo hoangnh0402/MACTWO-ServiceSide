@@ -1,0 +1,16 @@
+package com.mactwo.event;
+
+import com.mactwo.event.base.EventBase;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class UserStatusChangedEvent extends EventBase {
+    private Long userId;
+    private boolean isActive;
+}
