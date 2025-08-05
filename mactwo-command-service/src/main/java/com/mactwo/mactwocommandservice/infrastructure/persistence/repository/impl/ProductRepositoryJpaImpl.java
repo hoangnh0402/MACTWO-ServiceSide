@@ -29,4 +29,9 @@ public class ProductRepositoryJpaImpl implements ProductRepository {
     public void deleteById(Long id) {
         jpaRepository.deleteById(id);
     }
+
+    @Override
+    public boolean existsByCategoryId(Long categoryId) {
+        return jpaRepository.existsByCategoryId(categoryId);
+    }
 }

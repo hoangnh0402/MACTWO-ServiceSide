@@ -54,9 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        jwt = authHeader.substring(7);
+        jwt = authHeader.substring(7).trim();
 
-        // Kiểm tra token có trong danh sách logout trên Redis không
         if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + jwt))) {
             log.warn("Attempted to use a logged-out JWT: {}", jwt);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

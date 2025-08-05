@@ -30,4 +30,9 @@ public class CategoryRepositoryJpaImpl implements CategoryRepository {
     public List<Category> findAll() {
         return jpaRepository.findAll();
     }
+
+    @Override
+    public void deleteById(Long id) { // Bổ sung triển khai cho phương thức xóa
+        jpaRepository.deleteById(id);
+    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "product_variants")
@@ -23,6 +24,11 @@ public class ProductVariant {
     private String storage;
 
     private String ram;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_variant_images", joinColumns = @JoinColumn(name = "variant_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls;
 
     private BigDecimal price;
 

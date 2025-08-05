@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class CreateProductRequest {
+public class UpdateProductRequest {
     private String name;
     private String description;
     private Long categoryId;

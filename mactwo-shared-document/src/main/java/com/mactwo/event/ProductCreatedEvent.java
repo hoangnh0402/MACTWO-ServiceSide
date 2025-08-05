@@ -16,9 +16,9 @@ import java.util.List;
 public class ProductCreatedEvent extends EventBase {
     private Long productId;
     private String name;
-    private String brand;
     private String description;
     private Long categoryId;
+    private String imageUrl;
     private List<VariantInfo> variants;
 
     @Data
@@ -26,11 +26,11 @@ public class ProductCreatedEvent extends EventBase {
     @AllArgsConstructor
     public static class VariantInfo {
         private Long variantId;
-        private String sku;
         private String color;
         private String storage;
         private String ram;
         private BigDecimal price;
         private int stockQuantity;
+        private List<String> imageUrls;
     }
 }

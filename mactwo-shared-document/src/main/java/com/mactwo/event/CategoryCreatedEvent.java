@@ -1,0 +1,17 @@
+package com.mactwo.event;
+
+import com.mactwo.event.base.EventBase;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class CategoryCreatedEvent extends EventBase {
+    private Long categoryId;
+    private String categoryName;
+    private Long parentId;
+}

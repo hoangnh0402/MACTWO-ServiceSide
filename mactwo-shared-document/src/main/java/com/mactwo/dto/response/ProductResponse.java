@@ -8,7 +8,6 @@ import java.util.List;
 public class ProductResponse {
     private Long id;
     private String name;
-    private String brand;
     private String description;
     private CategoryInfo category;
     private List<VariantResponse> variants;

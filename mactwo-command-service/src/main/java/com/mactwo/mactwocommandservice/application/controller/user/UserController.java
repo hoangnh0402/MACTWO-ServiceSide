@@ -1,10 +1,8 @@
 package com.mactwo.mactwocommandservice.application.controller.user;
 
 import com.mactwo.dto.request.user.UpdateProfileRequest;
-import com.mactwo.dto.request.user.UserRegisterRequest;
 import com.mactwo.mactwocommandservice.application.command.command.user.DeactivateUserCommand;
 import com.mactwo.mactwocommandservice.application.command.command.user.DeleteUserCommand;
-import com.mactwo.mactwocommandservice.application.command.command.user.RegisterUserCommand;
 import com.mactwo.mactwocommandservice.application.command.command.user.UpdateInfoUserCommand;
 import com.mactwo.mactwocommandservice.application.command.handler.auth.RegisterUserCommandHandler;
 import com.mactwo.mactwocommandservice.application.command.handler.user.DeactivateUserCommandHandler;
@@ -17,9 +15,7 @@ import com.mactwo.mactwocommandservice.infrastructure.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
