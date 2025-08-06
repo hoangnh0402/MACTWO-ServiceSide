@@ -1,7 +1,8 @@
+# File: docker-compose.yml (Đặt ở thư mục gốc)
 version: "3.8"
 
 networks:
-  mactwo-dev-net:
+  mactwo-net:
     driver: bridge
 
 volumes:
@@ -10,19 +11,21 @@ volumes:
   kafka_data:
 
 services:
+  # --- CÁC DỊCH VỤ HẠ TẦNG ---
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: mactwo_zookeeper
     networks:
-      - mactwo-dev-net
+      - mactwo-net
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
     container_name: mactwo_kafka
     networks:
-      - mactwo-dev-net
+      - mactwo-net
     ports:
       - "9092:9092"
     depends_on:
@@ -33,7 +36,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
@@ -41,7 +44,7 @@ services:
     image: mysql:8.0
     container_name: mactwo_mysql
     networks:
-      - mactwo-dev-net
+      - mactwo-net
     ports:
       - "3308:3306"
     volumes:
@@ -60,10 +63,41 @@ services:
     image: redis:7-alpine
     container_name: mactwo_redis
     networks:
-      - mactwo-dev-net
+      - mactwo-net
     ports:
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       retries: 5
+
+  # --- DỊCH VỤ ỨNG DỤNG ---
+  mactwo-command-service:
+    container_name: mactwo-command-service
+    # build: Chỉ dẫn cho Docker Compose tự build image từ mã nguồn
+    build:
+      context: . # Thư mục gốc chứa cả 2 project
+      dockerfile: mactwo-command-service/Dockerfile # Đường dẫn đến Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - mactwo-net
+    environment:
+      # Cấu hình để kết nối tới các dịch vụ khác bằng tên container
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mactwo_command_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=1
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
+      # Các biến môi trường khác
+      - SERVER_SERVLET_CONTEXT_PATH=/api/v1
+      - APPLICATION_SECURITY_JWT_SECRET_KEY=aVeryLongAndSecureSecretKeyForMactwoEcommerceApplicationThatIsAtLeast256Bits
+      - APPLICATION_SECURITY_JWT_EXPIRATION=86400000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started

@@ -20,7 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.mactwo</groupId>
-			<artifactId>mactwo-document-service</artifactId>
+			<artifactId>mactwo-shared-document</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
