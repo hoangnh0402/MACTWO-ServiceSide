@@ -1,4 +1,4 @@
-# File: docker-compose.yml (Đặt ở thư mục gốc)
+# File: docker-compose.yml (Phiên bản đã được cập nhật để sử dụng RDS)
 version: "3.8"
 
 networks:
@@ -6,7 +6,7 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  # Không còn cần volume cho mysql
   redis_data:
   kafka_data:
 
@@ -40,24 +40,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
-  mysql:
-    image: mysql:8.0
-    container_name: mactwo_mysql
-    networks:
-      - mactwo-net
-    ports:
-      - "3308:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mactwo_command_db
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: 1
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      retries: 5
+  # Dịch vụ mysql đã được xóa bỏ vì chúng ta đang sử dụng RDS
 
   redis:
     image: redis:7-alpine
@@ -74,29 +57,27 @@ services:
   # --- DỊCH VỤ ỨNG DỤNG ---
   mactwo-command-service:
     container_name: mactwo-command-service
-    # build: Chỉ dẫn cho Docker Compose tự build image từ mã nguồn
     build:
-      context: . # Thư mục gốc chứa cả 2 project
-      dockerfile: mactwo-command-service/Dockerfile # Đường dẫn đến Dockerfile
+      context: .
+      dockerfile: mactwo-command-service/Dockerfile
     ports:
       - "8081:8081"
     networks:
       - mactwo-net
     environment:
-      # Cấu hình để kết nối tới các dịch vụ khác bằng tên container
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mactwo_command_db?createDatabaseIfNotExist=true
+      # CẬP NHẬT: Cấu hình để kết nối tới RDS
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mactwo.chi0okgq8fjj.ap-northeast-1.rds.amazonaws.com:3306/mactwo_command_db?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=1
+      - SPRING_DATASOURCE_PASSWORD=admin123
+      # Các biến môi trường khác giữ nguyên
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
-      # Các biến môi trường khác
       - SERVER_SERVLET_CONTEXT_PATH=/api/v1
       - APPLICATION_SECURITY_JWT_SECRET_KEY=aVeryLongAndSecureSecretKeyForMactwoEcommerceApplicationThatIsAtLeast256Bits
       - APPLICATION_SECURITY_JWT_EXPIRATION=86400000
     depends_on:
-      mysql:
-        condition: service_healthy
+      # Không còn phụ thuộc vào mysql
       redis:
         condition: service_healthy
       kafka:
