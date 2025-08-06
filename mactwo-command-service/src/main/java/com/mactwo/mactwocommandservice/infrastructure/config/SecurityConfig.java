@@ -23,8 +23,8 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
 
     private static final String[] PUBLIC_URLS = {
-            "/auth/**",
-            "/users/register",
+            "/api/v1/auth/**",
+            "/api/v1/users/register",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html"
