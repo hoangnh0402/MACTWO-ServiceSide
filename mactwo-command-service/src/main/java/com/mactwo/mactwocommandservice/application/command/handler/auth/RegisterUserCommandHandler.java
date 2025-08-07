@@ -47,7 +47,7 @@ public class RegisterUserCommandHandler {
         User user = userMapper.toUser(command);
 
         user.setPasswordHash(passwordEncoder.encode(command.getPassword()));
-        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+        Role userRole = roleRepository.findByName(ERole.USER)
                 .orElseThrow(() -> new RuntimeException("Error: Default role ROLE_USER not found in database."));
         user.setRoles(Set.of(userRole));
         User savedUser = userRepository.save(user);

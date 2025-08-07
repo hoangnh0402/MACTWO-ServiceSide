@@ -13,3 +13,4 @@ public class CreateCategoryCommand {
         this.parentId = request.getParentId();
     }
 }
+

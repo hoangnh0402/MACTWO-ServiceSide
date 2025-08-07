@@ -24,6 +24,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.3.0
     container_name: mactwo_kafka
+    hostname: kafka
     networks:
       - mactwo-net
     ports:
