@@ -1,4 +1,3 @@
-# File: docker-compose.yml (Phiên bản đã được cập nhật để sử dụng RDS)
 version: "3.8"
 
 networks:
@@ -6,9 +5,10 @@ networks:
     driver: bridge
 
 volumes:
-  # Không còn cần volume cho mysql
   redis_data:
   kafka_data:
+  prometheus_data:
+  grafana_data:
 
 services:
   # --- CÁC DỊCH VỤ HẠ TẦNG ---
@@ -41,8 +41,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
-  # Dịch vụ mysql đã được xóa bỏ vì chúng ta đang sử dụng RDS
-
   redis:
     image: redis:7-alpine
     container_name: mactwo_redis
@@ -55,6 +53,40 @@ services:
       interval: 10s
       retries: 5
 
+  # --- CÁC DỊCH VỤ GIÁM SÁT ---
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mactwo_prometheus
+    networks:
+      - mactwo-net
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: mactwo_grafana
+    networks:
+      - mactwo-net
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: mactwo_zipkin
+    networks:
+      - mactwo-net
+    ports:
+      - "9411:9411"
+
   # --- DỊCH VỤ ỨNG DỤNG ---
   mactwo-command-service:
     container_name: mactwo-command-service
@@ -66,20 +98,52 @@ services:
     networks:
       - mactwo-net
     environment:
-      # CẬP NHẬT: Cấu hình để kết nối tới RDS
+      # RDS MySQL config
       - SPRING_DATASOURCE_URL=jdbc:mysql://mactwo.chi0okgq8fjj.ap-northeast-1.rds.amazonaws.com:3306/mactwo_command_db?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin123
-      # Các biến môi trường khác giữ nguyên
+      # Redis + Kafka
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
+      # JWT config
       - SERVER_SERVLET_CONTEXT_PATH=/api/v1
       - APPLICATION_SECURITY_JWT_SECRET_KEY=aVeryLongAndSecureSecretKeyForMactwoEcommerceApplicationThatIsAtLeast256Bits
       - APPLICATION_SECURITY_JWT_EXPIRATION=86400000
+      # Zipkin tracing
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
     depends_on:
-      # Không còn phụ thuộc vào mysql
       redis:
         condition: service_healthy
       kafka:
+        condition: service_started
+      zipkin:
+        condition: service_started
+
+  mactwo-query-service:
+    container_name: mactwo-query-service
+    build:
+      context: .
+      dockerfile: mactwo-query-service/Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - mactwo-net
+    environment:
+      # RDS MySQL config (có thể dùng DB khác nếu bạn muốn)
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mactwo.chi0okgq8fjj.ap-northeast-1.rds.amazonaws.com:3306/mactwo_query_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin123
+      # Redis + Kafka
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
+      # Zipkin tracing
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      zipkin:
         condition: service_started

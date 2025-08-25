@@ -1,0 +1,14 @@
+package com.mactwo.command.application.command.address;
+
+import lombok.Getter;
+
+@Getter
+public class DeleteAddressCommand {
+    private final Long userId;
+    private final Long addressId;
+
+    public DeleteAddressCommand(Long userId, Long addressId) {
+        this.userId = userId;
+        this.addressId = addressId;
+    }
+}
