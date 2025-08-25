@@ -13,77 +13,36 @@ Event-Driven Architecture: Các dịch vụ giao tiếp với nhau một cách b
 Clean Architecture: Cấu trúc code được tổ chức thành các tầng (Domain, Application, Infrastructure) để tách biệt logic nghiệp vụ khỏi các chi tiết kỹ thuật.
 
 Sơ đồ hệ thống
-graph TD
-subgraph Client
-User[<fa:fa-user> Người dùng]
-end
 
-    subgraph "API Gateway / Load Balancer"
-        Gateway(API Gateway)
-    end
-
-    subgraph "Services"
-        Cmd["<fa:fa-cogs> mactwo-command-service<br>(Xử lý Ghi)"]
-        Query["<fa:fa-search> mactwo-query-service<br>(Xử lý Đọc)"]
-    end
-
-    subgraph "Data & Event Platform"
-        Kafka( <fa:fa-random> Apache Kafka)
-        MySQL[<fa:fa-database> MySQL (RDS)<br>(Write DB)]
-        Elasticsearch[<fa:fa-database> Elasticsearch<br>(Read DB)]
-        Redis[<fa:fa-database> Redis<br>(Cache & Blacklist)]
-    end
-
-    subgraph "Monitoring & Tracing"
-        Prometheus(Prometheus)
-        Grafana(Grafana)
-        Zipkin(Zipkin)
-    end
-
-    User -- "API Requests" --> Gateway
-    Gateway -- "Lệnh (POST, PUT, DELETE)" --> Cmd
-    Gateway -- "Truy vấn (GET)" --> Query
-
-    Cmd -- "Lưu dữ liệu" --> MySQL
-    Cmd -- "Phát sự kiện" --> Kafka
-    Cmd -- "Gửi trace" --> Zipkin
-    Cmd -- "Xuất metrics" --> Prometheus
-
-    Kafka -- "Tiêu thụ sự kiện" --> Query
-    Query -- "Lưu dữ liệu đọc" --> Elasticsearch
-    Query -- "Gửi trace" --> Zipkin
-    Query -- "Xuất metrics" --> Prometheus
-
-    Prometheus -- "Thu thập metrics" --> Grafana
 
 🛠️ Công nghệ sử dụng
 Backend: Java 17, Spring Boot 3
 
 Database:
 
-Write: MySQL (triển khai trên Amazon RDS)
-
-Read: Elasticsearch
-
-Messaging: Apache Kafka
-
-Caching: Redis
-
-Bảo mật: Spring Security, JSON Web Token (JWT)
-
-API Documentation: Springdoc OpenAPI (Swagger UI)
-
-Containerization: Docker, Docker Compose
-
-Giám sát & Truy vết (Monitoring & Tracing):
-
-Metrics: Prometheus
-
-Visualization: Grafana
-
-Tracing: Zipkin
-
-Build Tool: Maven
+    Write: MySQL (triển khai trên Amazon RDS)
+    
+    Read: Elasticsearch
+    
+    Messaging: Apache Kafka
+    
+    Caching: Redis
+    
+    Bảo mật: Spring Security, JSON Web Token (JWT)
+    
+    API Documentation: Springdoc OpenAPI (Swagger UI)
+    
+    Containerization: Docker, Docker Compose
+    
+    Giám sát & Truy vết (Monitoring & Tracing):
+    
+    Metrics: Prometheus
+    
+    Visualization: Grafana
+    
+    Tracing: Zipkin
+    
+    Build Tool: Maven
 
 📂 Cấu trúc Dự án
 MACTWO-ServiceSide/
