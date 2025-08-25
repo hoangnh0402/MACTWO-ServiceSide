@@ -12,7 +12,8 @@ Event-Driven Architecture: Các dịch vụ giao tiếp với nhau một cách b
 
 Clean Architecture: Cấu trúc code được tổ chức thành các tầng (Domain, Application, Infrastructure) để tách biệt logic nghiệp vụ khỏi các chi tiết kỹ thuật.
 
-Sơ đồ hệ thống
+## Kiến trúc hệ thống
+![Kiến trúc hệ thống](https://raw.githubusercontent.com/hoangnh0402/MACTWO-ServiceSide/main/assets/kientruchethong.png)
 
 
 🛠️ Công nghệ sử dụng
@@ -45,15 +46,16 @@ Database:
     Build Tool: Maven
 
 📂 Cấu trúc Dự án
-MACTWO-ServiceSide/
-├── docker-compose.yml # File triển khai production
-├── mactwo-command-service/ # Dịch vụ xử lý tất cả các yêu cầu thay đổi dữ liệu
-│ ├── Dockerfile
-│ └── src/
-└── mactwo-shared-document/ # Module dùng chung chứa DTOs, Events, Constants
-└── src/
-
-(Lưu ý: mactwo-query-service sẽ được bổ sung sau)
+        MACTWO-ServiceSide/
+        ├── docker-compose.yml # File triển khai production
+        ├── mactwo-command-service/ 
+        │ ├── Dockerfile
+        │ └── src/
+        ├── mactwo-query-service/ 
+        │ ├── Dockerfile
+        │ └── src/
+        └── mactwo-shared-document/ 
+        └── src/
 
 🏃 Hướng dẫn Khởi chạy
 
